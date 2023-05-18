@@ -2,7 +2,7 @@ const {Client} = require("pg")
 
 const conexao = {
     host: 'localhost',
-    port: 5433,
+    port: 5432,
     database: 'fintech',
     user: 'postgres',
     password: '123456'

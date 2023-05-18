@@ -28,8 +28,21 @@ async function buscarPorId(id) {
     catch(err) { throw err; }
 }
 
+async function inserirConta(conta){
+    if (conta && conta.cliente) {
+        try {
+            
+            const contaInserida = await contaPersistencia.inserir(conta);
+            return contaInserida;
+        
+        } catch (err) {
+            throw err
+        }
+    }
+}
 
 module.exports = {
     buscarSaldo,
-    buscarPorId
+    buscarPorId,
+    inserirConta
 }

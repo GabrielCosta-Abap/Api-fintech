@@ -2,10 +2,10 @@ const {Client} = require("pg")
 
 const conexao = {
     host: 'localhost',
-    port: 5433,
+    port: 5432,
     database: 'fintech',
     user: 'postgres',
-    password: '123456'
+    password: 'Artallen@42'
 };
 
 async function buscarSaldo(id) {
@@ -64,9 +64,44 @@ async function buscarPorId(id) {
     }
 }
 
+async function inserir(conta) {
+
+    const cliente = new Client(conexao)
+    cliente.connect();
+
+    try {
+        
+        await cliente.query("BEGIN");
+
+        const sqlInserirCliente = "INSERT INTO clientes(cpf, nome, telefone) VALUES($1,$2,$3) RETURNING *";
+        const valuesCliente = [conta.cliente.cpf, conta.cliente.nome, conta.cliente.telefone];
+    
+        const resultado = await cliente.query(sqlInserirCliente, valuesCliente);
+
+        const sqlInserirConta = "INSERT INTO contas(saldo, status, cliente_id) VALUES($1,$2,$3) RETURNING *";
+        const valuesConta = [
+            conta.saldo ? conta.saldo : 0,
+            "A",
+            resultado.rows[0].id
+        ];
+
+        const resConta = await cliente.query(sqlInserirConta, valuesConta);
+        await cliente.query("COMMIT");
+        
+    } catch (error) {
+        await cliente.query("ROLLBACK");
+        throw error;
+        
+    } finally {
+        cliente.end();
+    }
+
+}
+
 module.exports = {
     buscarSaldo,
-    buscarPorId
+    buscarPorId,
+    inserir
 }
 
 // async function main() {
